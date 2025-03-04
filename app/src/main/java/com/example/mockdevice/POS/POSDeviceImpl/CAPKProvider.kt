@@ -2,14 +2,13 @@ package com.example.mockdevice.POS.POSDeviceImpl
 
 import android.content.Context
 import android.util.Log
-import com.example.mockdevice.POS.POSDeviceImpl.AIDS.Companion.aidList
-import java.io.IOException
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
+import java.io.IOException
 
 
-class CAPKS(private val context: Context) {
+class CAPKProvider(private val context: Context) {
     companion object{
         var capkList = mutableListOf<CapkData>()
     }
@@ -26,7 +25,7 @@ class CAPKS(private val context: Context) {
         }
         return capkList
     }
-    fun loadCapksFromJson(): List<CapkData> {
+    private fun loadCapksFromJson(): List<CapkData> {
         return try {
             val json = context.assets.open("capks.json").bufferedReader().use { it.readText() }
             val type = object : TypeToken<List<CapkData>>() {}.type
@@ -47,7 +46,7 @@ class CAPKS(private val context: Context) {
         }
     }
 
-    fun getDefaultCapks(): List<CapkData> {
+    private fun getDefaultCapks(): List<CapkData> {
         return listOf(
             CapkData(
                 rid = byteArrayOf(0xA0.toByte(), 0x00, 0x00, 0x00, 0x03, 0x10, 0x10).toString(),
@@ -67,6 +66,6 @@ class CAPKS(private val context: Context) {
                 expiryDate = "260101",
                 effectiveDate = "230101",
                 secureHash = "DEFAULT_HASH_2")
-        )
+        )//Todo Samuel agregar los de credibanco
     }
 }

@@ -3,17 +3,12 @@ package com.example.mockdevice.ACTIVITIES
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mockdevice.POS.POSDeviceImpl.AIDS
-import com.example.mockdevice.POS.POSDeviceImpl.CAPKS
 import com.example.mockdevice.POS.POSDeviceImpl.EKeyType
 import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice
 import com.example.mockdevice.POS.POSDeviceImpl.MockPOSDevice
-import com.google.gson.Gson
 
 class MockPOSActivity  : AppCompatActivity() {
     private lateinit var posDevice: IPOSDevice
-    private lateinit var aidsProcessor: AIDS
-    private lateinit var capksProcessor: CAPKS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +24,9 @@ class MockPOSActivity  : AppCompatActivity() {
 
         Log.d("MockTest", "MockPOSActivity iniciada")
         // Inicializar carga de AIDs y CAPKs con el contexto de la actividad
-        aidsProcessor = AIDS(this)
-        capksProcessor = CAPKS(this)
-        Log.d("MockTest", "Cargando AIDs y CAPKs...")
 
-        val aidsLoaded = aidsProcessor.getAIDS(mandatory = false)
-        val capksLoaded = capksProcessor.getCAPKS(mandatory = false)
-
-        posDevice.ConfigAids(aidsLoaded)
-        posDevice.ConfigCapks(capksLoaded)
+        posDevice.ConfigAids(this,false)
+        posDevice.ConfigCapks(this,false)
         // Ejecutar pruebas de funcionalidad
         testMockDevice()
     }

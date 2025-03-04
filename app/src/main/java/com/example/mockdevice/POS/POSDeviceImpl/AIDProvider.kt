@@ -6,7 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import java.io.IOException
-class AIDS (private val context: Context){
+class AIDProvider (private val context: Context){
     companion object {
         var aidList = mutableListOf<AidData>()
     }
@@ -25,7 +25,7 @@ class AIDS (private val context: Context){
         return aidList
     }
 
-    fun loadAidsFromJson(): List<AidData> {
+    private fun loadAidsFromJson(): List<AidData> {
         return try {
             val json = context.assets.open("aids.json").bufferedReader().use { it.readText() }
             val type = object : TypeToken<List<AidData>>() {}.type
@@ -57,7 +57,7 @@ class AIDS (private val context: Context){
                 transactionCurrencyCode = "0840",
                 terminalCountryCode = "032",
                 contactlessEnabled = false
-            )
+            )//Todo Samuel agregar los de credibanco
         )
     }
 }

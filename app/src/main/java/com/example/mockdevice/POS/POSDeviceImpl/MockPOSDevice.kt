@@ -132,38 +132,14 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         }*/
     }
 
-    override fun ConfigCapks(capkList: List<CapkData>): Boolean {
-        return if (capkList.isNotEmpty()) {
-            Log.d("MockPOSDevice", "CAPKs configurados correctamente (${capkList.size} CAPKs)")
-            true
-        } else {
-            Log.w("MockPOSDevice", "No se recibieron CAPKs, intentando cargar desde JSON...")
-            val fallbackCapks = CAPKS(context).loadCapksFromJson()
-            return if (fallbackCapks.isNotEmpty()) {
-                Log.d("MockPOSDevice", "CAPKs cargados desde JSON (${fallbackCapks.size} CAPKs)")
-                true
-            } else {
-                Log.e("MockPOSDevice", "No se encontraron CAPKs en JSON, abortando configuración.")
-                false
-            }
-        }
+    override fun ConfigCapks(capList:List<CapkData>) {
+
+        capksProcessor.getCAPKS(mandatory)
     }
 
-    override fun ConfigAids(aidList: List<AidData>): Boolean {
-        return if (aidList.isNotEmpty()) {
-            Log.d("MockPOSDevice", "AIDs configurados correctamente (${aidList.size} AIDs)")
-            true
-        } else {
-            Log.w("MockPOSDevice", "No se recibieron AIDs, intentando cargar desde JSON...")
-            val fallbackAids = AIDS(context).loadAidsFromJson()
-            return if (fallbackAids.isNotEmpty()) {
-                Log.d("MockPOSDevice", "AIDs cargados desde JSON (${fallbackAids.size} AIDs)")
-                true
-            } else {
-                Log.e("MockPOSDevice", "No se encontraron AIDs en JSON, abortando configuración.")
-                false
-            }
-        }
+    override fun ConfigAids(aidList:List<AidData>){
+        val AIDProviderProcessor = AIDProvider(context)
+        AIDProviderProcessor.getAIDS(aidList)
     }
 
     private fun generateKCV(): String = (1..KCV_LENGTH).map { random.nextInt(0, RANDOM_BOUND) }.joinToString("")
