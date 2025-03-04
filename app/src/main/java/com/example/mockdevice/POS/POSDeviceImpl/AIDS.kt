@@ -6,31 +6,23 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import java.io.IOException
-class AIDS (private val context: Context, private val mockPOSDevice: IPOSDevice){
+class AIDS (private val context: Context){
     companion object {
-        private var Aidlist = mutableListOf<AidData>()
+        var aidList = mutableListOf<AidData>()
     }
-    fun process(mandatory: Boolean): Boolean {
-        return if (Aidlist.isNotEmpty()) {
-            Log.d("AIDS", "Usando AIDs desde la caché (${Aidlist.size} AIDs)")
-            mockPOSDevice.ConfigAids(Aidlist)
-        } else {
-            Log.d("AIDS", "Caché vacía, buscando en JSON...")
-            val loadedAids = loadAidsFromJson()
-            Aidlist.addAll(loadedAids)
+    private fun loadAIDs(): List<AidData> =
+        loadAidsFromJson().ifEmpty { getDefaultAids() }
 
-            if (Aidlist.isEmpty()) {
-                if (mandatory) {
-                    Log.e("AIDS", "Error: No hay AIDs disponibles y mandatory es true")
-                    return false // Error crítico
-                } else {
-                    Log.d("AIDS", "No se encontraron AIDs en JSON, usando AIDs por defecto")
-                    Aidlist.addAll(getDefaultAids())
-                }
-            }
+    fun getAIDS(mandatory: Boolean): List<AidData> {
+        Log.i("AIDS", "Verificando si es mandatorio....")
 
-            mockPOSDevice.ConfigAids(Aidlist)
+        if (mandatory || aidList.isEmpty()) {
+            Log.i("AIDS", "ES MANDATORIO")
+            Log.d("AIDS", "Cargando AIDs desde JSON o valores por defecto...")
+            aidList.clear() // Asegura que los datos anteriores no interfieran
+            aidList.addAll(loadAIDs())
         }
+        return aidList
     }
 
     fun loadAidsFromJson(): List<AidData> {

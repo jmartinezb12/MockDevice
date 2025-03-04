@@ -2,37 +2,29 @@ package com.example.mockdevice.POS.POSDeviceImpl
 
 import android.content.Context
 import android.util.Log
+import com.example.mockdevice.POS.POSDeviceImpl.AIDS.Companion.aidList
 import java.io.IOException
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 
 
-class CAPKS(private val context: Context, private val mockPOSDevice: IPOSDevice) {
+class CAPKS(private val context: Context) {
     companion object{
-        private var Capklist = mutableListOf<CapkData>()
+        var capkList = mutableListOf<CapkData>()
     }
+    private fun loadCAPKs(): List<CapkData> =
+        loadCapksFromJson().ifEmpty { getDefaultCapks() }
 
-    fun process(mandatory:Boolean):Boolean{
-        return if (Capklist.isNotEmpty()) {
-            Log.d("CAPKS", "Usando CAPKs desde la caché (${Capklist.size} CAPKs)")
-            mockPOSDevice.ConfigCapks(Capklist)
-        } else {
-            Log.d("CAPKS", "Caché vacía, buscando en JSON...")
-            val loadedCapks = loadCapksFromJson()
-            Capklist.addAll(loadedCapks)
-
-            if (Capklist.isEmpty()) {
-                if (mandatory) {
-                    Log.e("CAPKS", "Error: No hay CAPKs disponibles y mandatory es true")
-                    return false // Error crítico
-                } else {
-                    Log.d("CAPKS", "No se encontraron CAPKs en JSON, usando CAPKs por defecto")
-                    Capklist.addAll(getDefaultCapks())
-                }
-            }
-            mockPOSDevice.ConfigCapks(Capklist)
+    fun getCAPKS(mandatory:Boolean): List<CapkData> {
+        Log.i("CAPKS", "Verificando si es mandatorio....")
+        if (mandatory || capkList.isEmpty()) {
+            Log.i("CAPKS", "ES MANDATORIO")
+            Log.d("CAPKS", "Cargando CAPKs desde JSON o valores por defecto...")
+            capkList.clear() // Asegura que los datos anteriores no interfieran
+            capkList.addAll(loadCAPKs())
         }
+        return capkList
     }
     fun loadCapksFromJson(): List<CapkData> {
         return try {

@@ -138,7 +138,7 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
             true
         } else {
             Log.w("MockPOSDevice", "No se recibieron CAPKs, intentando cargar desde JSON...")
-            val fallbackCapks = CAPKS(context, this).loadCapksFromJson()
+            val fallbackCapks = CAPKS(context).loadCapksFromJson()
             return if (fallbackCapks.isNotEmpty()) {
                 Log.d("MockPOSDevice", "CAPKs cargados desde JSON (${fallbackCapks.size} CAPKs)")
                 true
@@ -155,7 +155,7 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
             true
         } else {
             Log.w("MockPOSDevice", "No se recibieron AIDs, intentando cargar desde JSON...")
-            val fallbackAids = AIDS(context, this).loadAidsFromJson()
+            val fallbackAids = AIDS(context).loadAidsFromJson()
             return if (fallbackAids.isNotEmpty()) {
                 Log.d("MockPOSDevice", "AIDs cargados desde JSON (${fallbackAids.size} AIDs)")
                 true
