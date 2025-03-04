@@ -1,0 +1,62 @@
+[
+    {
+      "aid": "A0000000041010",
+      "version": "0002",
+      "tacDenial": "0000000000",
+      "tacOnline": "FC50B8F800",
+      "tacDefault": "FC50B8A000",
+      "floorLimit": "00000000",
+      "dDol": "9F37040000000000000000000000000000000000",
+      "tDol": "9F02065F2A029A039C0195059F37040000000000",
+      "permiteParcialID": "00",
+      "label": "MasterCard"
+    },
+    {
+      "aid": "A0000000043060",
+      "version": "0002",
+      "tacDenial": "0000000000",
+      "tacOnline": "FC50B8F800",
+      "tacDefault": "FC50B8A000",
+      "floorLimit": "00000000",
+      "dDol": "9F37040000000000000000000000000000000000",
+      "tDol": "9F02065F2A029A039C0195059F37040000000000",
+      "permiteParcialID": "00",
+      "label": "Maestro"
+    },
+    {
+      "aid": "A0000000031010",
+      "version": "008C",
+      "tacDenial": "0010000000",
+      "tacOnline": "DC4004F800",
+      "tacDefault": "DC4000A800",
+      "floorLimit": "00000000",
+      "dDol": "039F3704",
+      "tDol": "0F9F02065F2A029A039C0195059F3704",
+      "permiteParcialID": "01",
+      "label": "VISA"
+    },
+    {
+      "aid": "A0000000032010",
+      "version": "008C",
+      "tacDenial": "0010000000",
+      "tacOnline": "DC4004F800",
+      "tacDefault": "DC4000A800",
+      "floorLimit": "00000000",
+      "dDol": "039F3704",
+      "tDol": "0F9F02065F2A029A039C0195059F3704",
+      "permiteParcialID": "01",
+      "label": "VISAELECTRON"
+    },
+    {
+      "aid": "A0000000033010",
+      "version": "008C",
+      "tacDenial": "0010000000",
+      "tacOnline": "DC4004F800",
+      "tacDefault": "DC4000A800",
+      "floorLimit": "00000000",
+      "dDol": "9F37040000000000000000000000000000000000",
+      "tDol": "0000000000000000000000000000000000000000",
+      "permiteParcialID": "01",
+      "label": "INTERLINK"
+    }
+]

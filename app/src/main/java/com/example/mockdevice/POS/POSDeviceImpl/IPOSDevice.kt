@@ -1,7 +1,7 @@
 package com.example.mockdevice.POS.POSDeviceImpl
 
 interface IPOSDevice {
-    fun scan(filter: String):List<BTDeviceInfo>
+    fun scan(filter: String):List<MockPOSDevice.BTDeviceInfo>
     fun connect(macAddress: String): Boolean
     fun disconnect()
     fun isConnect(): Boolean
@@ -12,6 +12,8 @@ interface IPOSDevice {
     fun startTransaction(): Boolean
     fun confirmTransaction(): Boolean
     fun LoadEMVParameters()
+    fun ConfigCapks(capkList:List<CapkData>):Boolean
+    fun ConfigAids(aidList:List<AidData>):Boolean
     fun isKeyInstalled(keyIndex:Byte):Boolean
     fun getKCV(keyIndex:Byte): String
     fun injectKey(keyType: EKeyType, keyIndex: Byte, key: String):Boolean
