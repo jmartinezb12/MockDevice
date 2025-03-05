@@ -21,6 +21,8 @@ class AIDProvider (private val context: Context){
             Log.d("AIDS", "Cargando AIDs desde JSON o valores por defecto...")
             aidList.clear() // Asegura que los datos anteriores no interfieran
             aidList.addAll(loadAIDs())
+        }else{
+            Log.w("AIDS", "La actualización es correcta. No se necesita actualizar")
         }
         return aidList
     }
@@ -31,6 +33,7 @@ class AIDProvider (private val context: Context){
             val type = object : TypeToken<List<AidData>>() {}.type
             val parsedJson: List<AidData> = Gson().fromJson(json, type)
 
+            Log.i("AIDS", "Checking AIDS loading process via json is empty")
             if (parsedJson.isEmpty()) {
                 Log.e("AIDS", "Error: JSON de AIDs vacío.")
             } else {
@@ -46,18 +49,68 @@ class AIDProvider (private val context: Context){
         }
     }
 
-    private fun getDefaultAids(): List<AidData> {
+    fun getDefaultAids(): List<AidData> {
         return listOf(
             AidData(
-                aid = "A0000000041010",
-                applicationLabel = "MasterCard",
+                aid = "A0000000031010",
+                applicationLabel = "Visa Credit",
                 terminalCapabilities = "E000F0",
                 additionalTerminalCapabilities = "F000F0A001",
                 terminalType = 0x00,
                 transactionCurrencyCode = "0840",
                 terminalCountryCode = "032",
                 contactlessEnabled = false
-            )//Todo Samuel agregar los de credibanco
+            ),
+            AidData(
+                aid = "A0000000032010",
+                applicationLabel = "Visa Debit",
+                terminalCapabilities = "E000F0",
+                additionalTerminalCapabilities = "F000F0A001",
+                terminalType = 0x00,
+                transactionCurrencyCode = "0840",
+                terminalCountryCode = "032",
+                contactlessEnabled = false
+            ),
+            AidData(
+                aid = "A0000000041010",
+                applicationLabel = "MasterCard Credit",
+                terminalCapabilities = "E000F0",
+                additionalTerminalCapabilities = "F000F0A001",
+                terminalType = 0x00,
+                transactionCurrencyCode = "0840",
+                terminalCountryCode = "032",
+                contactlessEnabled = false
+            ),
+            AidData(
+                aid = "A0000000043060",
+                applicationLabel = "MasterCard Debit",
+                terminalCapabilities = "E000F0",
+                additionalTerminalCapabilities = "F000F0A001",
+                terminalType = 0x00,
+                transactionCurrencyCode = "0840",
+                terminalCountryCode = "032",
+                contactlessEnabled = false
+            ),
+            AidData(
+                aid = "A0000001523010",
+                applicationLabel = "Credibanco AID 1",
+                terminalCapabilities = "E000F0",
+                additionalTerminalCapabilities = "F000F0A001",
+                terminalType = 0x00,
+                transactionCurrencyCode = "0840",
+                terminalCountryCode = "032",
+                contactlessEnabled = true
+            ),
+            AidData(
+                aid = "A0000001524010",
+                applicationLabel = "Credibanco AID 2",
+                terminalCapabilities = "E000F0",
+                additionalTerminalCapabilities = "F000F0A001",
+                terminalType = 0x00,
+                transactionCurrencyCode = "0840",
+                terminalCountryCode = "032",
+                contactlessEnabled = true
+            )
         )
     }
 }

@@ -22,15 +22,19 @@ class CAPKProvider(private val context: Context) {
             Log.d("CAPKS", "Cargando CAPKs desde JSON o valores por defecto...")
             capkList.clear() // Asegura que los datos anteriores no interfieran
             capkList.addAll(loadCAPKs())
+        }else{
+            Log.w("CAPKS", "La actualización es correcta. No se necesita actualizar")
         }
         return capkList
     }
     private fun loadCapksFromJson(): List<CapkData> {
+        Log.i("CAPKS", "Initiating CAPKS loading process via json.....")
         return try {
             val json = context.assets.open("capks.json").bufferedReader().use { it.readText() }
             val type = object : TypeToken<List<CapkData>>() {}.type
             val parsedJson: List<CapkData> = Gson().fromJson(json, type)
 
+            Log.i("CAPKS", "Checking CAPKS loading process via json is empty")
             if (parsedJson.isEmpty()) {
                 Log.e("CAPKS", "Error: JSON de CAPKs vacío.")
             } else {
@@ -49,23 +53,55 @@ class CAPKProvider(private val context: Context) {
     private fun getDefaultCapks(): List<CapkData> {
         return listOf(
             CapkData(
-                rid = byteArrayOf(0xA0.toByte(), 0x00, 0x00, 0x00, 0x03, 0x10, 0x10).toString(),
+                rid = "A000000003",
                 index = 0x01,
                 exponent = 0x03,
                 modulus = "DEFAULT_MODULUS_1",
                 checksum = "CHECKSUM1",
                 expiryDate = "260101",
                 effectiveDate = "230101",
-                secureHash = "DEFAULT_HASH_1"),
+                secureHash = "DEFAULT_HASH_1"
+            ),
             CapkData(
-                rid = byteArrayOf(0xA0.toByte(), 0x00, 0x00, 0x00, 0x03, 0x10, 0x10).toString(),
+                rid = "A000000003",
                 index = 0x02,
                 exponent = 0x03,
                 modulus = "DEFAULT_MODULUS_2",
                 checksum = "CHECKSUM2",
                 expiryDate = "260101",
                 effectiveDate = "230101",
-                secureHash = "DEFAULT_HASH_2")
-        )//Todo Samuel agregar los de credibanco
+                secureHash = "DEFAULT_HASH_2"
+            ),
+            CapkData(
+                rid = "A000000004",
+                index = 0x03,
+                exponent = 0x03,
+                modulus = "DEFAULT_MODULUS_3",
+                checksum = "CHECKSUM3",
+                expiryDate = "260101",
+                effectiveDate = "230101",
+                secureHash = "DEFAULT_HASH_3"
+            ),
+            CapkData(
+                rid = "A000000004",
+                index = 0x04,
+                exponent = 0x03,
+                modulus = "CREDIBANCO_MODULUS_1",
+                checksum = "CREDIBANCO_CHECKSUM1",
+                expiryDate = "270101",
+                effectiveDate = "240101",
+                secureHash = "CREDIBANCO_HASH_1"
+            ),
+            CapkData(
+                rid = "A000000004",
+                index = 0x05,
+                exponent = 0x03,
+                modulus = "CREDIBANCO_MODULUS_2",
+                checksum = "CREDIBANCO_CHECKSUM2",
+                expiryDate = "270101",
+                effectiveDate = "240101",
+                secureHash = "CREDIBANCO_HASH_2"
+            )
+        )
     }
 }

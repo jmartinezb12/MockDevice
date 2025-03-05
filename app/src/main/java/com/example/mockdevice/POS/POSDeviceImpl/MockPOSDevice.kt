@@ -132,14 +132,38 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         }*/
     }
 
-    override fun ConfigCapks(capList:List<CapkData>) {
+    override fun ConfigCapks(capList:List<CapkData>):Boolean {
+        Log.i("INFO_CONFIG_EMV","Initializing CAPKS configuration")
+        if (capList.isEmpty()) {
+            Log.w("INFO_CONFIG_EMV", "The CAPK list is empty!")
+            return false
+        }
 
-        capksProcessor.getCAPKS(mandatory)
+        capList.forEach { capk ->
+            Log.d(
+                "INFO_CONFIG_EMV",
+                "RID: ${capk.rid}, Index: ${capk.index}, Exponent: ${capk.exponent}, " +
+                        "Modulus: ${capk.modulus}, Checksum: ${capk.checksum}, " +
+                        "Expiry Date: ${capk.expiryDate}, Effective Date: ${capk.effectiveDate}, " +
+                        "Secure Hash: ${capk.secureHash}"
+            )
+        }
+        return true
     }
 
-    override fun ConfigAids(aidList:List<AidData>){
-        val AIDProviderProcessor = AIDProvider(context)
-        AIDProviderProcessor.getAIDS(aidList)
+    override fun ConfigAids(aidList:List<AidData>):Boolean{
+        Log.i("INFO_CONFIG_EMV","Initializing AIDS configuration")
+        if (aidList.isEmpty()) {
+            Log.w("INFO_CONFIG_EMV", "The AID list is empty!")
+            return false
+        }
+        aidList.forEach { aid ->
+            Log.d("INFO_CONFIG_EMV", "AID: ${aid.aid}, Label: ${aid.applicationLabel}, " +
+                    "Capabilities: ${aid.terminalCapabilities}, ATC: ${aid.additionalTerminalCapabilities}, " +
+                    "Type: ${aid.terminalType}, Currency: ${aid.transactionCurrencyCode}, " +
+                    "Country: ${aid.terminalCountryCode}, Contactless: ${aid.contactlessEnabled}")
+        }
+        return true
     }
 
     private fun generateKCV(): String = (1..KCV_LENGTH).map { random.nextInt(0, RANDOM_BOUND) }.joinToString("")
@@ -147,6 +171,7 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
     override fun getKCV(keyIndex: Byte): String = keyData[keyIndex]?.second ?: "Clave no encontrada"
 
     private fun setKeyState(index: Byte, state: Boolean): Boolean {
+        log("INFO", "Setting key state initializing")
         return if (index in 0..MAX_KEY_INDEX) {
             keyData[index] = state to generateKCV()
             log("DEBUG", "Key index $index state set to $state")

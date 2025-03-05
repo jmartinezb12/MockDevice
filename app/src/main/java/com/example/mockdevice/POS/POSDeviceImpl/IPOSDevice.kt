@@ -14,8 +14,8 @@ interface IPOSDevice {
     fun startTransaction(): Boolean
     fun confirmTransaction(): Boolean
     fun LoadEMVParameters()
-    fun ConfigCapks(capList:List<CapkData>)
-    fun ConfigAids(aidList:List<AidData>)
+    fun ConfigCapks(capList:List<CapkData>):Boolean
+    fun ConfigAids(aidList:List<AidData>):Boolean
     fun isKeyInstalled(keyIndex:Byte):Boolean
     fun getKCV(keyIndex:Byte): String
     fun injectKey(keyType: EKeyType, keyIndex: Byte, key: String):Boolean

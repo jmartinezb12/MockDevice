@@ -1,29 +1,41 @@
 package com.example.mockdevice.POS.POSDeviceImpl
 
 import android.content.Context
+import android.util.Log
 import com.example.mockdevice.POS.POSDeviceImpl.EMVConfigException.Companion.AID_NO_AVALIABLE
 import com.example.mockdevice.POS.POSDeviceImpl.EMVConfigException.Companion.CAPK_NO_AVALIABLE
 
 class ConfigEMV (private val context:Context,private val posDevice: IPOSDevice){
-    private fun ConfigCapks(mandatory: Boolean):Boolean {
+    fun ConfigCapks(mandatory: Boolean):Boolean {
+        Log.i("INFO_CONFIG_EMV","Getting CAPKS beginning....")
         val capkList = CAPKProvider(context).getCAPKS(mandatory)
         if (capkList.isEmpty()){
-            throw EMVConfigException(CAPK_NO_AVALIABLE,"NON AVALIABLE CAPKS",)
+            Log.i("FAIL_CONFIG_EMV","Failing CAPKS process")
+            throw EMVConfigException(CAPK_NO_AVALIABLE,"NON AVALIABLE CAPKS")
         }
-        posDevice.ConfigCapks(capkList)
+        return posDevice.ConfigCapks(capkList)
+
     }
-    private fun ConfigAids(mandatory: Boolean):Boolean{
+    fun ConfigAids(mandatory: Boolean):Boolean{
+        Log.i("INFO_CONFIG_EMV","Getting AIDS beginning....")
         val aidList = AIDProvider(context).getAIDS(mandatory)
         if (aidList.isEmpty()){
-            throw EMVConfigException(AID_NO_AVALIABLE,"NON AVALIABLE AIDS",)
+            Log.i("FAIL_CONFIG_EMV","Failing AIDS process")
+            throw EMVConfigException(AID_NO_AVALIABLE,"NON AVALIABLE AIDS")
         }
-        posDevice.ConfigAids(aidList)
+        return posDevice.ConfigAids(aidList)
     }
-    fun execute(mandatory:Boolean):Boolean{
+    fun configure(mandatory:Boolean):Boolean{
 
-        ConfigAids(mandatory)
-        if (ConfigCapks(mandatory)){
-
+        if (!ConfigCapks(mandatory)){
+            Log.w("ERROR_CONFIGURE_CAPKS","couldn't configure CAPKS correctly")
+            return false
         }
+        if(!ConfigAids(mandatory)){
+            Log.w("ERROR_CONFIGURE_AIDS","couldn't configure AIDS correctly")
+            return false
+        }
+        Log.i("SUCCESS","The EMV configuration was done correctly!!")
+        return true
     }
 }

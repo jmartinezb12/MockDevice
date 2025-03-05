@@ -1,8 +1,10 @@
 package com.example.mockdevice.ACTIVITIES
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.mockdevice.POS.POSDeviceImpl.ConfigEMV
 import com.example.mockdevice.POS.POSDeviceImpl.EKeyType
 import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice
 import com.example.mockdevice.POS.POSDeviceImpl.MockPOSDevice
@@ -25,8 +27,8 @@ class MockPOSActivity  : AppCompatActivity() {
         Log.d("MockTest", "MockPOSActivity iniciada")
         // Inicializar carga de AIDs y CAPKs con el contexto de la actividad
 
-        posDevice.ConfigAids(this,false)
-        posDevice.ConfigCapks(this,false)
+
+
         // Ejecutar pruebas de funcionalidad
         testMockDevice()
     }
@@ -84,5 +86,16 @@ class MockPOSActivity  : AppCompatActivity() {
         Log.d("MockTest", "Desconectando dispositivo...")
         posDevice.disconnect()
 
+        EMVConfig()
+
+    }
+    fun EMVConfig(){
+        val configEMV = ConfigEMV(this,posDevice)
+        configEMV.ConfigAids(true)
+        configEMV.ConfigCapks(true)
+        configEMV.configure(true)
+        configEMV.ConfigAids(false)
+        configEMV.ConfigCapks(false)
+        configEMV.configure(false)
     }
 }
