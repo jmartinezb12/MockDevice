@@ -1,7 +1,5 @@
 package com.example.mockdevice.POS.POSDeviceImpl
 
-import android.content.Context
-
 interface IPOSDevice {
     fun scan(filter: String):List<MockPOSDevice.BTDeviceInfo>
     fun connect(macAddress: String): Boolean
