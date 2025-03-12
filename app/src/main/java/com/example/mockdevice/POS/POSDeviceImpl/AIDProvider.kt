@@ -51,66 +51,15 @@ class AIDProvider (private val context: Context){
 
     fun getDefaultAids(): List<AidData> {
         return listOf(
-            AidData(
-                aid = "A0000000031010",
-                applicationLabel = "Visa Credit",
-                terminalCapabilities = "E000F0",
-                additionalTerminalCapabilities = "F000F0A001",
-                terminalType = 0x00,
-                transactionCurrencyCode = "0840",
-                terminalCountryCode = "032",
-                contactlessEnabled = false
-            ),
-            AidData(
-                aid = "A0000000032010",
-                applicationLabel = "Visa Debit",
-                terminalCapabilities = "E000F0",
-                additionalTerminalCapabilities = "F000F0A001",
-                terminalType = 0x00,
-                transactionCurrencyCode = "0840",
-                terminalCountryCode = "032",
-                contactlessEnabled = false
-            ),
-            AidData(
-                aid = "A0000000041010",
-                applicationLabel = "MasterCard Credit",
-                terminalCapabilities = "E000F0",
-                additionalTerminalCapabilities = "F000F0A001",
-                terminalType = 0x00,
-                transactionCurrencyCode = "0840",
-                terminalCountryCode = "032",
-                contactlessEnabled = false
-            ),
-            AidData(
-                aid = "A0000000043060",
-                applicationLabel = "MasterCard Debit",
-                terminalCapabilities = "E000F0",
-                additionalTerminalCapabilities = "F000F0A001",
-                terminalType = 0x00,
-                transactionCurrencyCode = "0840",
-                terminalCountryCode = "032",
-                contactlessEnabled = false
-            ),
-            AidData(
-                aid = "A0000001523010",
-                applicationLabel = "Credibanco AID 1",
-                terminalCapabilities = "E000F0",
-                additionalTerminalCapabilities = "F000F0A001",
-                terminalType = 0x00,
-                transactionCurrencyCode = "0840",
-                terminalCountryCode = "032",
-                contactlessEnabled = true
-            ),
-            AidData(
-                aid = "A0000001524010",
-                applicationLabel = "Credibanco AID 2",
-                terminalCapabilities = "E000F0",
-                additionalTerminalCapabilities = "F000F0A001",
-                terminalType = 0x00,
-                transactionCurrencyCode = "0840",
-                terminalCountryCode = "032",
-                contactlessEnabled = true
-            )
+            AidData("A0000000041010", "0002", "0000000000", "FC50B8F800", "FC50B8A000", "00000000", "00000000", "9F3704000000000000000000000000000000000000", "9F02065F2A029A039C0195059F37040000000000", 0x00, "MasterCard"),
+            AidData("A0000000043060", "0002", "0000000000", "FC50B8F800", "FC50B8A000", "00000000", "00000000", "9F3704000000000000000000000000000000000000", "9F02065F2A029A039C0195059F37040000000000", 0x00, "Maestro"),
+            AidData("A0000000031010", "008C", "0010000000", "DC4004F800", "DC4000A800", "00000000", "00000000", "039F3704", "0F9F02065F2A029A039C0195059F3704", 0x01, "VISA"),
+            AidData("A0000000032010", "008C", "0010000000", "DC4004F800", "DC4000A800", "00000000", "00000000", "039F3704", "0F9F02065F2A029A039C0195059F3704", 0x01, "VISAELECTRON"),
+            AidData("A0000000033010", "008C", "0010000000", "DC4004F800", "DC4000A800", "00000000", "00000000", "9F3704000000000000000000000000000000000000", "0000000000000000000000000000000000000000", 0x01, "INTERLINK"),
+            AidData("A0000000031020", "008C", "0010000000", "DC4004F800", "DC4000A800", "00000000", "00000000", "9F3704000000000000000000000000000000000000", "9F02060000000000000000000000000000000000", 0x00, "VISAPriv"),
+            AidData("F04C4154414D00", "008C", "0010000000", "DC4004F800", "DC4000A800", "00000000", "00000000", "039F3704", "0F9F02065F2A029A039C0195059F3704", 0x01, "WHITELEVEL"),
+            AidData("A00000030559", "008D", "0010000000", "DC4004F800", "DC4000A800", "00000000", "00000000", "039F3704", "209F02060000000000000000000000000000000000", 0x01, "CLAVE"),
+            AidData("A00000049999", "0002", "0000000000", "FC50A88000", "FC50A88000", "00000000", "00000000", "039F3704", "209F02060000000000000000000000000000000000", 0x00, "Clave")
         )
     }
 }

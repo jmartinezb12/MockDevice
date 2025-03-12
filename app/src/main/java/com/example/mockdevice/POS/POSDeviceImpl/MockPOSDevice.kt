@@ -2,6 +2,8 @@ package com.example.mockdevice.POS.POSDeviceImpl
 
 import android.content.Context
 import android.util.Log
+import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice.ELightColor
+import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice.LedColor
 import kotlin.random.Random
 
 
@@ -37,14 +39,15 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         model = "D180S"
     )
 
-    data class BTDeviceInfo(val address: String, val name: String)
+    data class BTDeviceInfo(val address: String, val name: String, val paired:Boolean)
 
     private val btDevices = listOf(
-        BTDeviceInfo("00:11:22:33:44:55", "D180000001"),
-        BTDeviceInfo("66:77:88:99:AA:BB", "D190000001"),
-        BTDeviceInfo("CC:DD:EE:FF:00:11", "D200000001"),
-        BTDeviceInfo("22:33:44:55:66:77", "D180000002"),
-        BTDeviceInfo("88:99:AA:BB:CC:DD", "D180000003")
+        BTDeviceInfo("00:11:22:33:44:55", "D180000001",false),
+        BTDeviceInfo("66:77:88:99:AA:BB", "D190000001",false),
+        BTDeviceInfo("CC:DD:EE:FF:00:11", "D200000001",false),
+        BTDeviceInfo("22:33:44:55:66:77", "D180000002",false),
+        BTDeviceInfo("88:99:AA:BB:CC:DD", "D180CB-Q4850003",true),
+        BTDeviceInfo("C8:40:52:26:E9:05", "D180CB-6Q216158",true)
     )
 
     private val keyData: MutableMap<Byte, Pair<Boolean, String>> = mutableMapOf(
@@ -67,11 +70,21 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         }
     }
 
-    override fun scan(filter: String): List<BTDeviceInfo> =
-        btDevices.filter { it.name.contains(filter, ignoreCase = true) }
+    override fun scan(filter: String, timeout: Int): List<BTDeviceInfo> {
+        log("DEBUG", "Starting scan with timeout: $timeout ms...")
+        Thread.sleep((timeout / 2).toLong())  // Simulate delay
+        return btDevices.filter { it.name.contains(filter, ignoreCase = true) }
             .also { log("DEBUG", "Dispositivos escaneados: ${it.joinToString { dev -> dev.name }}") }
+    }
 
-    override fun connect(macAddress: String): Boolean {
+    override fun getPairedDevices(filter: String, timeout: Int): List<BTDeviceInfo> {
+        log("DEBUG", "Retrieving paired devices (timeout: $timeout ms)...")
+        Thread.sleep((timeout / 2).toLong())  // Simulate delay
+        return btDevices.filter { it.paired && it.name.contains(filter, ignoreCase = true) }
+            .also { log("DEBUG", "Paired devices found: ${it.joinToString { it.name }}") }
+    }
+
+    override fun connect(macAddress: String, timeout: Int): Boolean {
         log("INFO", "Intentando conectar con el dispositivo en la dirección: $macAddress")
         connected = true
         log("INFO", "Conexión exitosa con el dispositivo.")
@@ -132,6 +145,29 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         }*/
     }
 
+    override fun setLightState(colors: Set<ELightColor>, state: Boolean) {
+        for (color in colors) {
+            when (color) {
+                ELightColor.LIGHT_RED -> setLedHardware("RED", state)
+                ELightColor.LIGHT_GREEN -> setLedHardware("GREEN", state)
+                ELightColor.LIGHT_YELLOW -> setLedHardware("YELLOW", state)
+                ELightColor.LIGHT_BLUE -> setLedHardware("BLUE", state)
+            }
+        }
+        log("INFO", "Lights updated: $colors set to ${if (state) "ON" else "OFF"}")
+    }
+    override fun changeAllLightState(state: Boolean) {
+        val action = if (state) "ON" else "OFF"
+        log("INFO", "Turning $action all LEDs")
+        setLedHardware("RED", state)
+        setLedHardware("GREEN", state)
+        setLedHardware("YELLOW", state)
+        setLedHardware("BLUE", state)
+    }
+    private fun setLedHardware(color: String, state: Boolean) {
+        // Simulación de la interacción con el hardware del POS
+        log("DEBUG", "LED $color set to ${if (state) "ON" else "OFF"}")
+    }
     override fun ConfigCapks(capList:List<CapkData>):Boolean {
         Log.i("INFO_CONFIG_EMV","Initializing CAPKS configuration")
         if (capList.isEmpty()) {
@@ -152,17 +188,15 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
     }
 
     override fun ConfigAids(aidList:List<AidData>):Boolean{
-        Log.i("INFO_CONFIG_EMV","Initializing AIDS configuration")
         if (aidList.isEmpty()) {
-            Log.w("INFO_CONFIG_EMV", "The AID list is empty!")
+            Log.w("INFO_CONFIG_EMV", "⚠️ The AID list is empty!")
             return false
         }
+
         aidList.forEach { aid ->
-            Log.d("INFO_CONFIG_EMV", "AID: ${aid.aid}, Label: ${aid.applicationLabel}, " +
-                    "Capabilities: ${aid.terminalCapabilities}, ATC: ${aid.additionalTerminalCapabilities}, " +
-                    "Type: ${aid.terminalType}, Currency: ${aid.transactionCurrencyCode}, " +
-                    "Country: ${aid.terminalCountryCode}, Contactless: ${aid.contactlessEnabled}")
+            Log.d("INFO_CONFIG_EMV", "🔹 Configuring AID: ${aid.aid}\n   - Name: ${aid.nombre}\n   - Version: ${aid.version}\n   - TAC Denial: ${aid.TACDenial}\n   - TAC Online: ${aid.TACOnline}\n   - TAC Default: ${aid.TACDefault}\n   - Terminal Floor Limit: ${aid.terminalFloorLimit}\n   - Threshold: ${aid.threshold}\n   - DDOL: ${aid.dDOL}\n   - TDOL: ${aid.tDOL}\n   - Partial AID Allowed: ${aid.permiteAIDParcial}")
         }
+
         return true
     }
 

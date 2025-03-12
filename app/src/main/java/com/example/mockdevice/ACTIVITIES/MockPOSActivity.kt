@@ -35,13 +35,7 @@ class MockPOSActivity  : AppCompatActivity() {
 
     private fun testMockDevice() {
         Log.d("MockTest", "Escaneando dispositivos...")
-        val devices = posDevice.scan("D180")
-        devices.forEach { Log.d("MockTest", "Encontrado: ${it.name} - ${it.address}") }
 
-        Log.d("MockTest", "Intentando conectar...")
-        if (posDevice.connect("00:11:22:33:44:55")) {
-            Log.d("MockTest", "Conectado correctamente")
-        }
 
         Log.d("MockTest", "Inyectando clave en índice 3...")
         posDevice.injectKey(EKeyType.MASTER_KEY, 3, "1234567890ABCDEF")
@@ -88,6 +82,36 @@ class MockPOSActivity  : AppCompatActivity() {
 
         EMVConfig()
 
+        Log.d("MockTest", "🔹 Buscando dispositivos emparejados...")
+        val pairedDevices = posDevice.getPairedDevices("D180", 5000)
+
+        if (pairedDevices.isNotEmpty()) {
+            Log.d("MockTest", "✅ Dispositivo emparejado encontrado: ${pairedDevices[0].name} - ${pairedDevices[0].address}")
+            Log.d("MockTest", "🔹 Intentando conectar con el dispositivo emparejado...")
+
+            if (posDevice.connect(pairedDevices[0].address, 5000)) {
+                Log.d("MockTest", "✅ Conectado con éxito a ${pairedDevices[0].name}")
+                return // If successful, skip scanning
+            }
+        } else {
+            Log.d("MockTest", "⚠️ No hay dispositivos emparejados, iniciando escaneo...")
+        }
+
+        Log.d("MockTest", "🔹 Escaneando dispositivos disponibles...")
+        val scannedDevices = posDevice.scan("D180", 5000)
+
+        if (scannedDevices.isNotEmpty()) {
+            Log.d("MockTest", "✅ Dispositivo encontrado: ${scannedDevices[0].name} - ${scannedDevices[0].address}")
+            Log.d("MockTest", "🔹 Intentando conectar con el dispositivo escaneado...")
+
+            if (posDevice.connect(scannedDevices[0].address, 5000)) {
+                Log.d("MockTest", "✅ Conexión exitosa con ${scannedDevices[0].name}")
+            } else {
+                Log.d("MockTest", "❌ No se pudo conectar con el dispositivo ${scannedDevices[0].name}")
+            }
+        } else {
+            Log.d("MockTest", "❌ No se encontraron dispositivos disponibles tras el escaneo.")
+        }
     }
     fun EMVConfig(){
         val configEMV = ConfigEMV(this,posDevice)
@@ -98,4 +122,5 @@ class MockPOSActivity  : AppCompatActivity() {
         configEMV.ConfigCapks(false)
         configEMV.configure(false)
     }
+
 }
