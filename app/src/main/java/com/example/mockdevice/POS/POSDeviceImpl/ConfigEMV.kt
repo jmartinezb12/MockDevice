@@ -13,7 +13,7 @@ class ConfigEMV (private val context:Context,private val posDevice: IPOSDevice){
             Log.i("FAIL_CONFIG_EMV","Failing CAPKS process")
             throw EMVConfigException(CAPK_NO_AVALIABLE,"NON AVALIABLE CAPKS")
         }
-        return posDevice.ConfigCapks(capkList)
+        return posDevice.configCapks(capkList)
 
     }
     fun ConfigAids(mandatory: Boolean):Boolean{
@@ -23,7 +23,7 @@ class ConfigEMV (private val context:Context,private val posDevice: IPOSDevice){
             Log.i("FAIL_CONFIG_EMV","Failing AIDS process")
             throw EMVConfigException(AID_NO_AVALIABLE,"NON AVALIABLE AIDS")
         }
-        return posDevice.ConfigAids(aidList)
+        return posDevice.configAids(aidList)
     }
     fun configure(mandatory:Boolean):Boolean{
 

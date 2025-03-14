@@ -3,7 +3,6 @@ package com.example.mockdevice.POS.POSDeviceImpl
 import android.content.Context
 import android.util.Log
 import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice.ELightColor
-import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice.LedColor
 import kotlin.random.Random
 
 
@@ -70,25 +69,15 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         }
     }
 
-    override fun scan(filter: String, timeout: Int): List<BTDeviceInfo> {
-        log("DEBUG", "Starting scan with timeout: $timeout ms...")
-        Thread.sleep((timeout / 2).toLong())  // Simulate delay
-        return btDevices.filter { it.name.contains(filter, ignoreCase = true) }
-            .also { log("DEBUG", "Dispositivos escaneados: ${it.joinToString { dev -> dev.name }}") }
+    override fun scan(timeout: Int): Set<IPOSDevice.BTDeviceInfo> {
+        TODO("Not yet implemented")
     }
 
-    override fun getPairedDevices(filter: String, timeout: Int): List<BTDeviceInfo> {
-        log("DEBUG", "Retrieving paired devices (timeout: $timeout ms)...")
-        Thread.sleep((timeout / 2).toLong())  // Simulate delay
-        return btDevices.filter { it.paired && it.name.contains(filter, ignoreCase = true) }
-            .also { log("DEBUG", "Paired devices found: ${it.joinToString { it.name }}") }
-    }
-
-    override fun connect(macAddress: String, timeout: Int): Boolean {
-        log("INFO", "Intentando conectar con el dispositivo en la dirección: $macAddress")
-        connected = true
-        log("INFO", "Conexión exitosa con el dispositivo.")
-        return connected
+    override fun connect(
+        deviceInfo: IPOSDevice.BTDeviceInfo,
+        timeout: Int
+    ): Boolean {
+        TODO("Not yet implemented")
     }
 
     override fun disconnect() {
@@ -101,26 +90,16 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         log("INFO", "Verificando si el dispositivo está conectado: $it")
     }
 
-    override fun sendCommand(command: String) {
-        log("INFO", "Enviando comando al POS: $command")
+    fun isBluetoothDevice(): Boolean {
+        TODO("Not yet implemented")
     }
 
-    override fun receiveResponse(): String {
-        log("INFO", "Recibiendo respuesta simulada del POS...")
-        return RESPONSE_OK
-    }
-
-    override fun initTransaction(): Boolean {
+    fun initTransaction(): Boolean {
         log("INFO", "Inicializando transacción simulada...")
         return true
     }
 
-    override fun startTransaction(): Boolean {
-        log("INFO", "Ejecutando transacción simulada...")
-        return true
-    }
-
-    override fun requestPIN(pinData: IPOSDevice.PinData): Boolean {
+    override fun requestPIN(pinData: IPOSDevice.EPinData): Boolean {
         log("INFO", "Solicitando PIN al usuario -> $pinData")
         pinData.pinBlock = PIN_BLOCK
         pinData.result = true
@@ -128,12 +107,36 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         return pinData.result
     }
 
-    override fun confirmTransaction(): Boolean {
-        log("INFO", "Confirmando transacción...")
-        return true
+    override fun detectCard(
+        supportedCards: Set<IPOSDevice.ECardType>,
+        supportFallback: String,
+        timeout: Int
+    ): Boolean {
+        TODO("Not yet implemented")
     }
 
-    override fun LoadEMVParameters() {
+    override fun startTransaction(
+        terminalData: IPOSDevice.TerminalData,
+        transactionData: IPOSDevice.TransactionData,
+        pinData: IPOSDevice.EPinData
+    ): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun confirmTransaction(issuerData: IPOSDevice.IssuerData): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTlvData(): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun loadEmvParameters(capList: Set<CapkData>, aidList: Set<AidData>): Boolean {
+        TODO("Not yet implemented")
+    }
+
+
+    fun LoadEMVParameters() {
         /*log("INFO", "Cargando parámetros EMV simulados de Credibanco...")
 
         mockEmvData.aids.forEach {
@@ -168,7 +171,7 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         // Simulación de la interacción con el hardware del POS
         log("DEBUG", "LED $color set to ${if (state) "ON" else "OFF"}")
     }
-    override fun ConfigCapks(capList:List<CapkData>):Boolean {
+    override fun configCapks(capList:Set<CapkData>):Boolean {
         Log.i("INFO_CONFIG_EMV","Initializing CAPKS configuration")
         if (capList.isEmpty()) {
             Log.w("INFO_CONFIG_EMV", "The CAPK list is empty!")
@@ -187,7 +190,7 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
         return true
     }
 
-    override fun ConfigAids(aidList:List<AidData>):Boolean{
+    override fun configAids(aidList:Set<AidData>):Boolean{
         if (aidList.isEmpty()) {
             Log.w("INFO_CONFIG_EMV", "⚠️ The AID list is empty!")
             return false
@@ -231,5 +234,12 @@ class MockPOSDevice(private val context: Context,private val appName: String, pr
 
     override fun getInfo(): AppInfo = mockInfo.also {
         log("DEBUG", "Retrieving device information: ${it.appName} - ${it.appVersion}")
+    }
+
+    override fun waitKeys(
+        keys: Set<IPOSDevice.EKeyboard>,
+        timeout: Int
+    ): IPOSDevice.EKeyboard {
+        TODO("Not yet implemented")
     }
 }

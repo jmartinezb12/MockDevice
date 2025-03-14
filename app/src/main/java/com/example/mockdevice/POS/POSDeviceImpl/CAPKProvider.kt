@@ -6,33 +6,38 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import java.io.IOException
+import java.util.Collections
 
 
 class CAPKProvider(private val context: Context) {
     companion object{
-        var capkList = mutableListOf<CapkData>()
+        //var capkList = mutableListOf<CapkData>()
+        var capkList:MutableSet<CapkData> = Collections.synchronizedSet(mutableSetOf())
     }
-    private fun loadCAPKs(): List<CapkData> =
+    private fun loadCAPKs(): Set<CapkData> =
         loadCapksFromJson().ifEmpty { getDefaultCapks() }
 
-    fun getCAPKS(mandatory:Boolean): List<CapkData> {
+    fun getCAPKS(mandatory:Boolean): Set<CapkData> {
         Log.i("CAPKS", "Verificando si es mandatorio....")
-        if (mandatory || capkList.isEmpty()) {
-            Log.i("CAPKS", "ES MANDATORIO")
-            Log.d("CAPKS", "Cargando CAPKs desde JSON o valores por defecto...")
-            capkList.clear() // Asegura que los datos anteriores no interfieran
-            capkList.addAll(loadCAPKs())
-        }else{
-            Log.w("CAPKS", "La actualización es correcta. No se necesita actualizar")
+        synchronized(capkList){
+
+            if (mandatory || capkList.isEmpty()) {
+                Log.i("CAPKS", "ES MANDATORIO")
+                Log.d("CAPKS", "Cargando CAPKs desde JSON o valores por defecto...")
+                capkList.clear() // Asegura que los datos anteriores no interfieran
+                capkList.addAll(loadCAPKs())
+            }else{
+                Log.w("CAPKS", "La actualización es correcta. No se necesita actualizar")
+            }
         }
-        return capkList
+        return capkList.toSet()
     }
-    private fun loadCapksFromJson(): List<CapkData> {
+    private fun loadCapksFromJson(): Set<CapkData> {
         Log.i("CAPKS", "Initiating CAPKS loading process via json.....")
         return try {
             val json = context.assets.open("capks.json").bufferedReader().use { it.readText() }
-            val type = object : TypeToken<List<CapkData>>() {}.type
-            val parsedJson: List<CapkData> = Gson().fromJson(json, type)
+            val type = object : TypeToken<Set<CapkData>>() {}.type
+            val parsedJson: Set<CapkData> = Gson().fromJson(json, type)
 
             Log.i("CAPKS", "Checking CAPKS loading process via json is empty")
             if (parsedJson.isEmpty()) {
@@ -43,15 +48,15 @@ class CAPKProvider(private val context: Context) {
             parsedJson
         } catch (ex: IOException) {
             Log.e("CAPKS", "Error al cargar CAPKs desde JSON: ${ex.message}")
-            emptyList()
+            emptySet()
         } catch (ex: JsonSyntaxException) {
             Log.e("CAPKS", "Formato incorrecto en JSON: ${ex.message}")
-            emptyList()
+            emptySet()
         }
     }
 
-    private fun getDefaultCapks(): List<CapkData> {
-        return listOf(
+    private fun getDefaultCapks(): Set<CapkData> {
+        return setOf(
             CapkData(
                 rid = "A000000003",
                 index = 0x01,

@@ -1,16 +1,26 @@
 package com.example.mockdevice.ACTIVITIES
 
-import android.content.Context
+import android.Manifest
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.mockdevice.POS.POSDeviceImpl.ConfigEMV
 import com.example.mockdevice.POS.POSDeviceImpl.EKeyType
-import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice
 import com.example.mockdevice.POS.POSDeviceImpl.MockPOSDevice
+import com.example.mockdevice.POS.POSDeviceImpl.IPOSDevice
+import com.example.mockdevice.POS.POSDeviceImpl.btScan
 
 class MockPOSActivity  : AppCompatActivity() {
     private lateinit var posDevice: IPOSDevice
+    val bluetoothManager = btScan(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,50 +35,65 @@ class MockPOSActivity  : AppCompatActivity() {
         )
 
         Log.d("MockTest", "MockPOSActivity iniciada")
-        // Inicializar carga de AIDs y CAPKs con el contexto de la actividad
-
-
-
-        // Ejecutar pruebas de funcionalidad
-        testMockDevice()
+        bluetoothManager.resetScannerState()
+        requestBluetoothPermissions()
     }
+
+    private fun requestBluetoothPermissions() {
+        val permissions = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> { // Android 13+ (API 33)
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.NEARBY_WIFI_DEVICES
+                )
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> { // Android 12 (API 31-32)
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> { // Android 10 y 11 (API 29-30)
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            else -> { // Android 9 y anteriores
+                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+        }
+
+        val missingPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            requestPermissionLauncher.launch(missingPermissions.toTypedArray())
+        } else {
+            Log.d("MockTest", "✅ Permisos ya concedidos.")
+            testMockDevice()
+        }
+    }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.all { it.value }
+            if (allGranted) {
+                Log.d("MockTest", "✅ Todos los permisos concedidos. Iniciando escaneo...")
+                testMockDevice()
+            } else {
+                Log.e("MockTest", "❌ Permisos denegados. No se puede escanear Bluetooth.")
+            }
+        }
 
     private fun testMockDevice() {
         Log.d("MockTest", "Escaneando dispositivos...")
-
-
         Log.d("MockTest", "Inyectando clave en índice 3...")
         posDevice.injectKey(EKeyType.MASTER_KEY, 3, "1234567890ABCDEF")
         Log.d("MockTest", "KCV de índice 3: ${posDevice.getKCV(3)}")
 
-        Log.d("MockTest", "Solicitando PIN...")
-        val pinData = IPOSDevice.PinData(3, pan = "1234567890123456")
-        posDevice.requestPIN(pinData)
-
         Log.d("MockTest", "Verificando clave instalada en índice 3...")
-        posDevice.isKeyInstalled(3)
-
-        Log.d("MockTest", "Enviando comando 'TEST_COMMAND'...")
-        posDevice.sendCommand("TEST_COMMAND")
-
-        Log.d("MockTest", "Recibiendo respuesta del POS...")
-        val response = posDevice.receiveResponse()
-        Log.d("MockTest", "Respuesta recibida: $response")
-
-        Log.d("MockTest", "Inicializando transacción...")
-        if (posDevice.initTransaction()) {
-            Log.d("MockTest", "Transacción inicializada correctamente")
-        }
-
-        Log.d("MockTest", "Iniciando transacción...")
-        if (posDevice.startTransaction()) {
-            Log.d("MockTest", "Transacción en proceso")
-        }
-
-        Log.d("MockTest", "Confirmando transacción...")
-        if (posDevice.confirmTransaction()) {
-            Log.d("MockTest", "Transacción confirmada exitosamente")
-        }
+        val isKeySet = posDevice.isKeyInstalled(3)
+        Log.d("MockTest", "Clave instalada en índice 3: $isKeySet")
 
         Log.d("MockTest", "Mostrando mensajes en pantalla...")
         posDevice.displayMessages(listOf("Mensaje 1", "Mensaje 2", "Mensaje 3"))
@@ -81,46 +106,17 @@ class MockPOSActivity  : AppCompatActivity() {
         posDevice.disconnect()
 
         EMVConfig()
-
-        Log.d("MockTest", "🔹 Buscando dispositivos emparejados...")
-        val pairedDevices = posDevice.getPairedDevices("D180", 5000)
-
-        if (pairedDevices.isNotEmpty()) {
-            Log.d("MockTest", "✅ Dispositivo emparejado encontrado: ${pairedDevices[0].name} - ${pairedDevices[0].address}")
-            Log.d("MockTest", "🔹 Intentando conectar con el dispositivo emparejado...")
-
-            if (posDevice.connect(pairedDevices[0].address, 5000)) {
-                Log.d("MockTest", "✅ Conectado con éxito a ${pairedDevices[0].name}")
-                return // If successful, skip scanning
-            }
-        } else {
-            Log.d("MockTest", "⚠️ No hay dispositivos emparejados, iniciando escaneo...")
-        }
-
-        Log.d("MockTest", "🔹 Escaneando dispositivos disponibles...")
-        val scannedDevices = posDevice.scan("D180", 5000)
-
-        if (scannedDevices.isNotEmpty()) {
-            Log.d("MockTest", "✅ Dispositivo encontrado: ${scannedDevices[0].name} - ${scannedDevices[0].address}")
-            Log.d("MockTest", "🔹 Intentando conectar con el dispositivo escaneado...")
-
-            if (posDevice.connect(scannedDevices[0].address, 5000)) {
-                Log.d("MockTest", "✅ Conexión exitosa con ${scannedDevices[0].name}")
-            } else {
-                Log.d("MockTest", "❌ No se pudo conectar con el dispositivo ${scannedDevices[0].name}")
-            }
-        } else {
-            Log.d("MockTest", "❌ No se encontraron dispositivos disponibles tras el escaneo.")
-        }
+        bluetoothManager.startScan()
     }
+
     fun EMVConfig(){
         val configEMV = ConfigEMV(this,posDevice)
+        Log.d("MockTest", "Configurando AIDs...")
         configEMV.ConfigAids(true)
+        Log.d("MockTest", "Configurando CAPKs...")
         configEMV.ConfigCapks(true)
+        Log.d("MockTest", "Ejecutando configuración general...")
         configEMV.configure(true)
-        configEMV.ConfigAids(false)
-        configEMV.ConfigCapks(false)
-        configEMV.configure(false)
     }
 
 }
